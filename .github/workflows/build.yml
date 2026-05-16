@@ -9,17 +9,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      ANDROIDAPI: "34"
+      ANDROIDMINAPI: "21"
+      ANDROIDNDK: "25b"
+
     steps:
-    # =========================
-    # 📥 CODE
-    # =========================
     - name: Checkout code
       uses: actions/checkout@v4
 
     # =========================
-    # 🧱 DEPENDANCES SYSTÈME
+    # 🧱 SYSTEM
     # =========================
-    - name: Install system dependencies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y python3-pip zip unzip git openjdk-17-jdk \
@@ -34,13 +36,27 @@ jobs:
         pip install buildozer cython
 
     # =========================
-    # 🧹 HARD CLEAN (IMPORTANT FIX)
+    # 🧹 CLEAN CACHE
     # =========================
-    - name: HARD CLEAN (IMPORTANT FIX)
+    - name: HARD CLEAN
       run: |
         rm -rf .buildozer
         rm -rf ~/.buildozer
         rm -rf ~/.android
+
+    # =========================
+    # 🔥 FORCE BUILD CONFIG BEFORE BUILD
+    # =========================
+    - name: Force Android 34 config
+      run: |
+        mkdir -p ~/.buildozer
+
+        cat > ~/.buildozer/config.ini << EOF
+[app]
+android.api = 34
+android.build_tools = 34.0.0
+android.minapi = 21
+EOF
 
     # =========================
     # 🚀 BUILD APK
@@ -50,7 +66,7 @@ jobs:
         buildozer -v android debug
 
     # =========================
-    # 📦 UPLOAD APK
+    # 📦 OUTPUT
     # =========================
     - name: Upload APK
       uses: actions/upload-artifact@v4
