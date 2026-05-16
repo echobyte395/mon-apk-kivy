@@ -1,13 +1,13 @@
 [app]
 
-# Nom de l'app
+# Nom de ton app
 title = Morpion
 
 # Identité Android
 package.name = morpion
 package.domain = org.raph
 
-# Fichiers source
+# Fichiers
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 
@@ -15,7 +15,7 @@ source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
 
 # Dépendances Python
-requirements = python3,kivy
+requirements = python3,kivy==2.2.1
 
 # Permissions
 android.permissions = INTERNET
@@ -26,16 +26,19 @@ orientation = portrait
 # Plein écran
 fullscreen = 1
 
-# 🔥 IMPORTANT FIX (anti bug GitHub Actions)
+# =========================
+# 🔥 FIX IMPORTANT ANDROID
+# =========================
+
 android.api = 34
 android.minapi = 21
 android.ndk = 25b
 android.archs = arm64-v8a
 
-# 🔥 FIX BUILD TOOLS (évite ton erreur 37)
+# 🔥 BLOQUE LES BUILD-TOOLS (IMPORTANT POUR TON BUG 37)
 android.build_tools = 34.0.0
 
-# évite certains crashs buildozer
+# évite certains crashs inutiles
 android.allow_backup = True
 
 
