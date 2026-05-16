@@ -13,22 +13,37 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    # =========================
+    # 🧱 SYSTEM DEPENDENCIES
+    # =========================
     - name: Install system dependencies
       run: |
         sudo apt update
         sudo apt install -y python3-pip zip unzip git openjdk-17-jdk \
         build-essential libffi-dev libssl-dev wget
 
+    # =========================
+    # 🐍 PYTHON TOOLS
+    # =========================
     - name: Install Python tools
       run: |
         pip install --upgrade pip
         pip install buildozer cython
 
-    # 🔥 Android SDK installation (clean + stable)
-    - name: Install Android SDK
+    # =========================
+    # 🧹 CLEAN BUILD (IMPORTANT)
+    # =========================
+    - name: Clean Buildozer cache
+      run: |
+        rm -rf .buildozer
+        rm -rf ~/.buildozer
+
+    # =========================
+    # 🤖 ANDROID SDK INSTALL
+    # =========================
+    - name: Install Android SDK (stable)
       run: |
         mkdir -p $HOME/android-sdk
-
         cd $HOME/android-sdk
 
         wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
@@ -42,8 +57,10 @@ jobs:
         echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
         echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
 
-    # 🔥 Install SDK + accept licenses (FIX IMPORTANT)
-    - name: Install Android platform
+    # =========================
+    # 🔥 FORCE ANDROID 34 (IMPORTANT)
+    # =========================
+    - name: Install Android 34 only
       run: |
         yes | sdkmanager --sdk_root=$HOME/android-sdk --licenses || true
 
@@ -52,12 +69,16 @@ jobs:
           "platforms;android-34" \
           "build-tools;34.0.0"
 
-    # 🔥 Build APK
+    # =========================
+    # 🚀 BUILD APK
+    # =========================
     - name: Build APK
       run: |
         buildozer -v android debug
 
-    # 📦 Upload APK
+    # =========================
+    # 📦 UPLOAD APK
+    # =========================
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
