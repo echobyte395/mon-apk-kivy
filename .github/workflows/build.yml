@@ -1,0 +1,59 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # =========================
+    # 📥 CODE
+    # =========================
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # =========================
+    # 🧱 DEPENDANCES SYSTÈME
+    # =========================
+    - name: Install system dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y python3-pip zip unzip git openjdk-17-jdk \
+        build-essential libffi-dev libssl-dev
+
+    # =========================
+    # 🐍 PYTHON
+    # =========================
+    - name: Install Python tools
+      run: |
+        pip install --upgrade pip
+        pip install buildozer cython
+
+    # =========================
+    # 🧹 HARD CLEAN (IMPORTANT FIX)
+    # =========================
+    - name: HARD CLEAN (IMPORTANT FIX)
+      run: |
+        rm -rf .buildozer
+        rm -rf ~/.buildozer
+        rm -rf ~/.android
+
+    # =========================
+    # 🚀 BUILD APK
+    # =========================
+    - name: Build APK
+      run: |
+        buildozer -v android debug
+
+    # =========================
+    # 📦 UPLOAD APK
+    # =========================
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: apk
+        path: bin/*.apk
