@@ -10,13 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # =========================
+    # 📥 CODE
+    # =========================
     - name: Checkout code
       uses: actions/checkout@v4
 
     # =========================
-    # 🧱 SYSTEM DEPENDENCIES
+    # 🧱 DEPENDANCES SYSTÈME
     # =========================
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         sudo apt update
         sudo apt install -y python3-pip zip unzip git openjdk-17-jdk \
@@ -31,14 +34,16 @@ jobs:
         pip install buildozer cython
 
     # =========================
-    # 🧹 CLEAN (IMPORTANT)
+    # 🧹 HARD CLEAN (IMPORTANT FIX)
     # =========================
-    - name: Clean Buildozer cache
+    - name: HARD CLEAN (IMPORTANT FIX)
       run: |
-        rm -rf .buildozer ~/.buildozer
+        rm -rf .buildozer
+        rm -rf ~/.buildozer
+        rm -rf ~/.android
 
     # =========================
-    # 🚀 BUILD APK (IMPORTANT FIX)
+    # 🚀 BUILD APK
     # =========================
     - name: Build APK
       run: |
