@@ -13,72 +13,41 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # =========================
-    # 🧱 SYSTEM DEPENDENCIES
-    # =========================
     - name: Install system dependencies
       run: |
         sudo apt update
         sudo apt install -y python3-pip zip unzip git openjdk-17-jdk \
         build-essential libffi-dev libssl-dev wget
 
-    # =========================
-    # 🐍 PYTHON TOOLS
-    # =========================
     - name: Install Python tools
       run: |
         pip install --upgrade pip
         pip install buildozer cython
 
     # =========================
-    # 🧹 CLEAN BUILD (IMPORTANT)
+    # 🚨 IMPORTANT FIX CACHE
     # =========================
-    - name: Clean Buildozer cache
+    - name: Clean buildozer cache
       run: |
-        rm -rf .buildozer
-        rm -rf ~/.buildozer
+        rm -rf .buildozer ~/.buildozer
 
     # =========================
-    # 🤖 ANDROID SDK INSTALL
+    # 🤖 USE PREINSTALLED SDK (IMPORTANT FIX)
     # =========================
-    - name: Install Android SDK (stable)
+    - name: Setup Android SDK (NO SDKMANAGER BUILD 37)
       run: |
-        mkdir -p $HOME/android-sdk
-        cd $HOME/android-sdk
+        sudo apt install -y android-sdk
 
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-        unzip -q commandlinetools-linux-11076708_latest.zip
-
-        mkdir -p cmdline-tools/latest
-        mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
-
-        echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-        echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-        echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-        echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+        echo "ANDROID_HOME=/usr/lib/android-sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=/usr/lib/android-sdk" >> $GITHUB_ENV
 
     # =========================
-    # 🔥 FORCE ANDROID 34 (IMPORTANT)
-    # =========================
-    - name: Install Android 34 only
-      run: |
-        yes | sdkmanager --sdk_root=$HOME/android-sdk --licenses || true
-
-        sdkmanager --sdk_root=$HOME/android-sdk \
-          "platform-tools" \
-          "platforms;android-34" \
-          "build-tools;34.0.0"
-
-    # =========================
-    # 🚀 BUILD APK
+    # 🚀 BUILD DIRECT (NO sdkmanager 37)
     # =========================
     - name: Build APK
       run: |
         buildozer -v android debug
 
-    # =========================
-    # 📦 UPLOAD APK
-    # =========================
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
